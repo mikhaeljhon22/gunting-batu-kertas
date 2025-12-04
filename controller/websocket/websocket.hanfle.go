@@ -37,33 +37,113 @@ func (h *WebSocketHandler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
+
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println("Error reading message:", err)
 			break
 		}
+
 		var payload CreateRoomPayload
 		if err := json.Unmarshal(message, &payload); err != nil {
 			fmt.Println("Invalid JSON:", err)
-			conn.WriteMessage(websocket.TextMessage, []byte("invalid json"))
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"error":"invalid json"}`)) // FIXED: tambah ( setelah []byte
 			continue
 		}
 
-		res := h.playService.CreateRoom(payload.PlayerName, payload.RoomName)
-
-		if res != nil {
-			switch v := res.(type) {
-			case error:
-				conn.WriteMessage(websocket.TextMessage, []byte(v.Error()))
-			case string:
-				conn.WriteMessage(websocket.TextMessage, []byte(v))
-			default:
-				conn.WriteMessage(websocket.TextMessage, []byte("unknown response"))
-			}
+		err = h.playService.CreateRoom(payload.PlayerName, payload.RoomName)
+		if err != nil {
+			response := map[string]string{"error": err.Error()}
+			jsonResponse, _ := json.Marshal(response)
+			conn.WriteMessage(websocket.TextMessage, jsonResponse)
 			continue
 		}
 
-		conn.WriteMessage(websocket.TextMessage, []byte("room created"))
+		response := map[string]string{"message": "room created successfully"}
+		jsonResponse, _ := json.Marshal(response)
+		conn.WriteMessage(websocket.TextMessage, jsonResponse)
+	}
+}
+
+func (h *WebSocketHandler) JoinRoom(w http.ResponseWriter, r *http.Request) {
+	type JoinRoomPayload struct {
+		PlayerName string `json:"playerName"`
+		RoomName   string `json:"roomName"`
+	}
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println("Error upgrading:", err)
+		return
+	}
+	defer conn.Close()
+
+	for {
+		_, message, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("Error reading message:", err)
+			break
+		}
+
+		var payload JoinRoomPayload
+		if err := json.Unmarshal(message, &payload); err != nil {
+			fmt.Println("Invalid JSON:", err)
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"error":"invalid json"}`)) // FIXED: tambah ( setelah []byte
+			continue
+		}
+
+		err = h.playService.JoinRoom(payload.PlayerName, payload.RoomName)
+		if err != nil {
+			response := map[string]string{"error": err.Error()}
+			jsonResponse, _ := json.Marshal(response)
+			conn.WriteMessage(websocket.TextMessage, jsonResponse)
+			continue
+		}
+
+		response := map[string]string{"message": "joined room successfully"}
+		jsonResponse, _ := json.Marshal(response)
+		conn.WriteMessage(websocket.TextMessage, jsonResponse)
+	}
+}
+
+func (h *WebSocketHandler) LeaveRoom(w http.ResponseWriter, r *http.Request) {
+	type LeaveRoomPayload struct {
+		PlayerName string `json:"playerName"`
+		RoomName   string `json:"roomName"`
+	}
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println("Error upgrading:", err)
+		return
+	}
+	defer conn.Close()
+
+	for {
+		_, message, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("Error reading message:", err)
+			break
+		}
+
+		var payload LeaveRoomPayload
+		if err := json.Unmarshal(message, &payload); err != nil {
+			fmt.Println("Invalid JSON:", err)
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"error":"invalid json"}`)) // FIXED: tambah ( setelah []byte
+			continue
+		}
+
+		err = h.playService.LeaveRoom(payload.PlayerName, payload.RoomName)
+		if err != nil {
+			response := map[string]string{"error": err.Error()}
+			jsonResponse, _ := json.Marshal(response)
+			conn.WriteMessage(websocket.TextMessage, jsonResponse)
+			continue
+		}
+
+		response := map[string]string{"message": "left room successfully"}
+		jsonResponse, _ := json.Marshal(response)
+		conn.WriteMessage(websocket.TextMessage, jsonResponse)
 	}
 }
