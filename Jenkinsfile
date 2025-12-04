@@ -1,6 +1,9 @@
 pipeline{
     agent any
 
+tools {
+    go 'golang'
+}
     stages{
         stage("Build"){
             steps{
