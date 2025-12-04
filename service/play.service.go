@@ -3,21 +3,23 @@ package service
 import "guntingbatukertas/repo"
 
 type PlayService struct {
-	repo repo.PlayRepo
+	repo *repo.PlayRepo
 }
 
-func NewPlayService(r repo.PlayRepo) *PlayService {
+func NewPlayService(repo *repo.PlayRepo) *PlayService {
 	return &PlayService{
-		repo: r,
+		repo: repo,
 	}
 }
 
-func (ps *PlayService) CreateRoom(playerName string, roomName string) any {
-	// anggaplah validasi sudah dilakukan disini
-	return ps.repo.CreateRoom(playerName, roomName)
+func (s *PlayService) CreateRoom(playerName, roomName string) error {
+	return s.repo.CreateRoom(playerName, roomName)
 }
 
-func (ps *PlayService) JoinRoom(playerName string, roomName string) error {
-	// anggaplah validasi sudah dilakukan disini
-	return ps.repo.JoinRoom(playerName, roomName)
+func (s *PlayService) JoinRoom(playerName, roomName string) error {
+	return s.repo.JoinRoom(playerName, roomName)
+}
+
+func (s *PlayService) LeaveRoom(playerName, roomName string) error {
+	return s.repo.LeaveRoom(playerName, roomName)
 }
