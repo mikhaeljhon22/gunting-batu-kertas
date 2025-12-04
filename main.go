@@ -17,5 +17,7 @@ func main() {
 	http.HandleFunc("/ws", websocket.CreateRoom)
 	http.HandleFunc("/join", websocket.JoinRoom)
 	http.HandleFunc("/leave", websocket.LeaveRoom)
+	http.HandleFunc("/ws/fight", websocket.FightRoom)
 	http.ListenAndServe(":8082", nil)
+	
 }
