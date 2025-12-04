@@ -20,7 +20,6 @@ func NewPlayRepo(redis *redis.Client) *PlayRepo {
 func (r *PlayRepo) CreateRoom(playerName, roomName string) error {
 	ctx := context.Background()
 
-	// Check if room already exists
 	result, err := r.redis.Get(ctx, `room:`+roomName).Result()
 	if err != nil && err != redis.Nil {
 		return fmt.Errorf("failed to check room: %w", err)
