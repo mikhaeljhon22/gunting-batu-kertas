@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+
 	redisClient := configs.RedisConfig()
 
 	playRepo := repo.NewPlayRepo(redisClient)
@@ -17,5 +18,6 @@ func main() {
 	http.HandleFunc("/ws", websocket.CreateRoom)
 	http.HandleFunc("/join", websocket.JoinRoom)
 	http.HandleFunc("/leave", websocket.LeaveRoom)
+	http.HandleFunc("/fight", websocket.FightRoom)
 	http.ListenAndServe(":8082", nil)
 }

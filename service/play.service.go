@@ -23,3 +23,15 @@ func (s *PlayService) JoinRoom(playerName, roomName string) error {
 func (s *PlayService) LeaveRoom(playerName, roomName string) error {
 	return s.repo.LeaveRoom(playerName, roomName)
 }
+
+func (s *PlayService) SetPlayerMove(playerName, move string) error {
+	return s.repo.SetPlayerMove(playerName, move)
+}
+
+func (s *PlayService) GetFightResult(playerName string) (map[string]interface{}, error) {
+	return s.repo.GetFightResult(playerName)
+}
+
+func (s *PlayService) GetPlayerPoint(playerName string) (int, error) {
+	return s.repo.GetPlayerPoint(playerName)
+}
